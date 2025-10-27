@@ -2,14 +2,16 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Kalkulator Jumbo</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#007aff">
-  <link rel="apple-touch-icon" href="icon-512.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Jumbo">
+
+  <!-- PWA metatagi -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Kalkulator Jumbo" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -60,16 +62,38 @@
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
       display: none;
     }
+    #powiadomienie {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #007aff;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+      animation: fadein 0.3s ease, fadeout 0.3s ease 2.7s;
+    }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @keyframes fadeout {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
   </style>
 </head>
 <body>
   <h1>📦 Kalkulator Jumbo</h1>
 
   <label for="norma">Norma (orderów/godzinę):</label>
-  <input type="tel" id="norma" value="189" />
+  <input type="tel" id="norma" value="189" inputmode="numeric" />
 
   <label for="nowyOrder">Dodaj order:</label>
-  <input type="tel" id="nowyOrder" placeholder="np. 124" />
+  <input type="tel" id="nowyOrder" placeholder="np. 124" inputmode="numeric" />
 
   <div class="przyciski-order">
     <button onclick="dodajOrder()">Dodaj order</button>
@@ -79,7 +103,7 @@
   <div id="listaOrderow"></div>
 
   <label for="czas">Czas pracy (w godzinach):</label>
-  <input type="tel" id="czas" placeholder="np. 2,5" />
+  <input type="tel" id="czas" placeholder="np. 2,5" inputmode="decimal" />
 
   <button onclick="oblicz()">Oblicz produktywność</button>
   <button onclick="wyczysc()">Wyczyść dane</button>
@@ -88,7 +112,7 @@
 
   <div id="wynik"></div>
   <div id="historia"></div>
-
+  <div id="powiadomienie" style="display:none;"></div>
   <script>
     let ordery = [];
     let historiaList = [];
@@ -101,6 +125,15 @@
       }
     };
 
+    function pokazPowiadomienie(tresc) {
+      const div = document.getElementById("powiadomienie");
+      div.textContent = tresc;
+      div.style.display = "block";
+      setTimeout(() => {
+        div.style.display = "none";
+      }, 3000);
+    }
+
     function dodajOrder() {
       const input = document.getElementById("nowyOrder");
       const wartosc = parseInt(input.value.trim());
@@ -109,13 +142,13 @@
         input.value = "";
         pokazListeOrderow();
       } else {
-        alert("Wpisz poprawny numer orderu większy niż 0.");
+        pokazPowiadomienie("Wpisz poprawny numer orderu większy niż 0.");
       }
     }
 
     function usunOstatniOrder() {
       if (ordery.length === 0) {
-        alert("Brak orderów do usunięcia.");
+        pokazPowiadomienie("Brak orderów do usunięcia.");
         return;
       }
       ordery.pop();
@@ -139,15 +172,15 @@
       const czas = parseFloat(document.getElementById("czas").value.replace(",", "."));
 
       if (isNaN(norma) || norma <= 0) {
-        alert("Wpisz poprawną wartość normy.");
+        pokazPowiadomienie("Wpisz poprawną wartość normy.");
         return;
       }
       if (isNaN(czas) || czas <= 0) {
-        alert("Wpisz poprawny czas pracy.");
+        pokazPowiadomienie("Wpisz poprawny czas pracy.");
         return;
       }
       if (ordery.length === 0) {
-        alert("Dodaj przynajmniej jeden order.");
+        pokazPowiadomienie("Dodaj przynajmniej jeden order.");
         return;
       }
 
@@ -186,7 +219,6 @@
       document.getElementById("nowyOrder").value = "";
       document.getElementById("czas").value = "";
       document.getElementById("listaOrderow").style.display = "none";
-      document.getElementById("listaOrderow").innerHTML = "";
       document.getElementById("wynik").style.display = "none";
     }
 
@@ -198,21 +230,13 @@
 
     function kopiujHistorie() {
       if (historiaList.length === 0) {
-        alert("Brak historii do skopiowania.");
+        pokazPowiadomienie("Brak historii do skopiowania.");
         return;
       }
-      const tekst = historiaList.join("\n\n").replace(/<br>/g, "\n");
+      const tekst = historiaList.join("\n\n");
       navigator.clipboard.writeText(tekst).then(() => {
-        alert("Historia została skopiowana do schowka.");
-      }).catch(() => {
-        alert("Nie udało się skopiować.");
+        pokazPowiadomienie("Historia została skopiowana do schowka.");
       });
-    }
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker zarejestrowany'))
-        .catch(err => console.log('Błąd SW:', err));
     }
   </script>
 </body>
