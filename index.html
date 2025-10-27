@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalkulator Jumbo</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007aff">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Jumbo">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 15px;
+      background-color: #007aff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    .przyciski-order {
+      display: flex;
+      gap: 10px;
+    }
+    .przyciski-order button {
+      flex: 1;
+    }
+    #listaOrderow, #wynik, #historia {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .toast {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #007aff;
+      color: white;
+      padding: 14px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      font-size: 16px;
+      text-align: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out, bottom 0.3s ease-in-out;
+    }
+    .toast.show {
+      opacity: 1;
+      bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📦 Kalkulator Jumbo</h1>
+
+  <label for="norma">Norma (orderów/godzinę):</label>
+  <input type="tel" id="norma" value="189" />
+
+  <label for="nowyOrder">Dodaj order:</label>
+  <input type="tel" id="nowyOrder" placeholder="np. 124" />
+
+  <div class="przyciski-order">
+    <button onclick="dodajOrder()">Dodaj order</button>
+    <button onclick="usunOstatniOrder()">Usuń order</button>
+  </div>
+
+  <div id="listaOrderow"></div>
+
+  <label for="czas">Czas pracy (w godzinach):</label>
+  <input type="tel" id="czas" placeholder="np. 2,5" />
+
+  <button onclick="oblicz()">Oblicz produktywność</button>
+  <button onclick="wyczysc()">Wyczyść dane</button>
+  <button onclick="usunHistorie()">Usuń historię</button>
+  <button onclick="kopiujHistorie()">Kopiuj historię</button>
+
+  <div id="wynik"></div>
+  <div id="historia"></div>
+
+  <script>
+    let ordery = [];
+    let historiaList = [];
+
+    function showToast(message, color = "#007aff") {
+      let toast = document.createElement("div");
+      toast.className = "toast";
+      toast.style.backgroundColor = color;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.classList.add("show"), 50);
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    window.onload = () => {
+      const saved = localStorage.getItem("jumboHistoria");
+      if (saved) {
+        historiaList = JSON.parse(saved);
+        pokazHistorie();
+      }
+    };
+
+    function dodajOrder() {
+      const input = document.getElementById("nowyOrder");
+      const wartosc = parseInt(input.value.trim());
+      if (!isNaN(wartosc) && wartosc > 0) {
+        ordery.push(wartosc);
+        input.value = "";
+        pokazListeOrderow();
+        showToast("Order dodany ✅", "#34c759");
+      } else {
+        showToast("Wpisz poprawny numer orderu większy niż 0.", "#ff3b30");
+      }
+    }
+
+    function usunOstatniOrder() {
+      if (ordery.length === 0) {
+        showToast("Brak orderów do usunięcia.", "#ff3b30");
+        return;
+      }
+      ordery.pop();
+      pokazListeOrderow();
+      showToast("Ostatni order usunięty.", "#ff9500");
+    }
+
+    function pokazListeOrderow() {
+      const div = document.getElementById("listaOrderow");
+      if (ordery.length === 0) {
+        div.style.display = "none";
+        div.innerHTML = "";
+        return;
+      }
+      const suma = ordery.reduce((a, b) => a + b, 0);
+      div.style.display = "block";
+      div.innerHTML = `<strong>📦 Ordery:</strong> ${ordery.join(", ")}<br><strong>🔢 Suma:</strong> ${suma}`;
+    }
+
+    function oblicz() {
+      const norma = parseFloat(document.getElementById("norma").value.replace(",", "."));
+      const czas = parseFloat(document.getElementById("czas").value.replace(",", "."));
+
+      if (isNaN(norma) || norma <= 0) {
+        showToast("Wpisz poprawną wartość normy.", "#ff3b30");
+        return;
+      }
+      if (isNaN(czas) || czas <= 0) {
+        showToast("Wpisz poprawny czas pracy.", "#ff3b30");
+        return;
+      }
+      if (ordery.length === 0) {
+        showToast("Dodaj przynajmniej jeden order.", "#ff3b30");
+        return;
+      }
+
+      const suma = ordery.reduce((a, b) => a + b, 0);
+      const produktywnosc = suma / czas;
+      const procent = (produktywnosc / norma) * 100;
+
+      const wynikDiv = document.getElementById("wynik");
+      wynikDiv.style.display = "block";
+      wynikDiv.style.backgroundColor =
+        procent >= 100 ? "#d4edda" : procent >= 90 ? "#fff3cd" : "#f8d7da";
+
+      wynikDiv.innerHTML = `
+        🔢 <strong>Suma orderów:</strong> ${suma}<br>
+        ⏱️ <strong>Produktywność:</strong> ${produktywnosc.toFixed(2)} ord/h<br>
+        🎯 <strong>Realizacja normy:</strong> ${procent.toFixed(1)}%
+      `;
+
+      const teraz = new Date();
+      const data = teraz.toLocaleDateString("pl-PL");
+      const godzina = teraz.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
+      const zapis = `✅ ${data} ${godzina} — ${suma} orderów w ${czas}h → ${produktywnosc.toFixed(2)} ord/h (${procent.toFixed(1)}%)<br>📦 Ordery: ${ordery.join(", ")}`;
+      historiaList.unshift(zapis);
+      localStorage.setItem("jumboHistoria", JSON.stringify(historiaList));
+      pokazHistorie();
+      showToast("Obliczono produktywność 🎯", "#34c759");
+    }
+
+    function pokazHistorie() {
+      const historiaDiv = document.getElementById("historia");
+      historiaDiv.style.display = "block";
+      historiaDiv.innerHTML = "<strong>📜 Historia obliczeń:</strong><br>" + historiaList.join("<br><br>");
+    }
+
+    function wyczysc() {
+      ordery = [];
+      document.getElementById("nowyOrder").value = "";
+      document.getElementById("czas").value = "";
+      document.getElementById("listaOrderow").style.display = "none";
+      document.getElementById("listaOrderow").innerHTML = "";
+      document.getElementById("wynik").style.display = "none";
+      showToast("Dane wyczyszczone 🧹", "#ff9500");
+    }
+
+    function usunHistorie() {
+      historiaList = [];
+      localStorage.removeItem("jumboHistoria");
+      document.getElementById("historia").style.display = "none";
+      showToast("Historia usunięta 🗑️", "#ff9500");
+    }
+
+    function kopiujHistorie() {
+      if (historiaList.length === 0) {
+        showToast("Brak historii do skopiowania.", "#ff3b30");
+        return;
+      }
+      const tekst = historiaList.join("\n\n").replace(/<br>/g, "\n");
+      navigator.clipboard.writeText(tekst).then(() => {
+        showToast("Historia skopiowana do schowka 📋", "#34c759");
+      }).catch(() => {
+        showToast("Nie udało się skopiować.", "#ff3b30");
+      });
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker zarejestrowany'))
+        .catch(err => console.log('Błąd SW:', err));
+    }
+  </script>
+</body>
+</html>
