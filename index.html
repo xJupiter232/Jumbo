@@ -121,6 +121,7 @@
     <section id="historia"></section>
   </main>
   <div id="powiadomienie" style="display:none;"></div>
+
   <script>
     let ordery = [];
     let historiaList = [];
@@ -219,10 +220,6 @@
         console.warn("Nie udało się zapisać historii:", e);
       }
       pokazHistorie();
-
-      // Reset po obliczeniu
-      ordery = [];
-      pokazListeOrderow();
     }
 
     function pokazHistorie() {
@@ -252,7 +249,7 @@
         pokazPowiadomienie("Brak historii do skopiowania.");
         return;
       }
-      const tekst = historiaList.join("\n\n");
+      const tekst = historiaList.join("\\n\\n");
       navigator.clipboard.writeText(tekst).then(() => {
         pokazPowiadomienie("Historia została skopiowana do schowka.");
       });
