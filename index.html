@@ -245,15 +245,17 @@
     }
 
     function kopiujHistorie() {
-      if (historiaList.length === 0) {
-        pokazPowiadomienie("Brak historii do skopiowania.");
-        return;
-      }
-      const tekst = historiaList.join("\\n\\n");
-      navigator.clipboard.writeText(tekst).then(() => {
-        pokazPowiadomienie("Historia została skopiowana do schowka.");
-      });
-    }
+  if (historiaList.length === 0) {
+    pokazPowiadomienie("Brak historii do skopiowania.");
+    return;
+  }
+  const tekst = historiaList
+    .map(e => e.replace(/<br>/g, "\n"))  // ← zamiana znaczników <br> na nową linię
+    .join("\n\n");
+  navigator.clipboard.writeText(tekst).then(() => {
+    pokazPowiadomienie("Historia została skopiowana do schowka.");
+  });
+}
   </script>
 
 <script>
