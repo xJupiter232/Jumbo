@@ -117,7 +117,7 @@
       const suma1 = orderyWszystkie.filter(o => o.sekcja === 1).reduce((a,b)=>a+b.wartosc,0);
       const suma2 = orderyWszystkie.filter(o => o.sekcja === 2).reduce((a,b)=>a+b.wartosc,0);
       const suma = suma1 + suma2;
-      const normaLaczna = ((suma1 * 189) + (suma2 * 198)) / suma;
+      const normaLaczna = ((suma1 * 189) + (suma2 * 197)) / suma;
       const produktywnosc = suma / czas;
       const procent = (produktywnosc / normaLaczna) * 100;
 
