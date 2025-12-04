@@ -6,177 +6,550 @@
   <title>Kalkulator Jumbo</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
-    main { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h1 { text-align: center; }
-    .sekcja { margin-bottom: 20px; }
-    label { font-weight: bold; display: block; margin-bottom: 5px; }
-    input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
-    button { width: 100%; padding: 10px; margin: 5px 0; border: none; border-radius: 5px; background: #007bff; color: white; font-size: 16px; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    #wynik { margin-top: 20px; padding: 15px; border-radius: 5px; font-weight: bold; }
-    #historia { margin-top: 20px; padding: 15px; background: #eef; border-radius: 5px; }
-    #listaOrderow { margin-top: 10px; padding: 10px; background: #eef; border-radius: 5px; display: none; }
-    .toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 5px; padding: 16px; position: fixed; z-index: 1; left: 50%; bottom: 30px; transform: translateX(-50%); }
-    .toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-    @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
-    @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+    main {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #111827;
+    }
+    p {
+      text-align: center;
+      color: #6b7280;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .sekcja {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #374151;
+    }
+    input[type="text"],
+    input[type="tel"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+    .przyciski-order {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      flex: 1;
+      min-width: 140px;
+      padding: 10px;
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s, box-shadow 0.1s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    button:active {
+      transform: scale(0.97);
+      box-shadow: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    }
+    .btn-secondary {
+      background-color: #e5e7eb;
+      color: #111827;
+    }
+    .btn-secondary:hover {
+      background-color: #d1d5db;
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+    }
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+    }
+    .btn-warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #111827;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+    }
+    .btn-warning:hover {
+      background: linear-gradient(135deg, #d97706, #b45309);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+    }
+    .btn-success:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+    }
+    #wynik, #historia {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background-color: #f9fafb;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    #wynik strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    #listaOrderow {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      font-size: 14px;
+      line-height: 1.4;
+      display: none;
+    }
+    #historia h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    #historia ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+    #historia li {
+      margin-bottom: 10px;
+    }
+    .toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #111827;
+      color: #ffffff;
+      text-align: center;
+      border-radius: 999px;
+      padding: 12px 18px;
+      position: fixed;
+      z-index: 1000;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 30px;
+      font-size: 14px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    .toast.show {
+      visibility: visible;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    @keyframes fadein {
+      from {bottom: 0; opacity: 0;}
+      to {bottom: 30px; opacity: 1;}
+    }
+    @keyframes fadeout {
+      from {bottom: 30px; opacity: 1;}
+      to {bottom: 0; opacity: 0;}
+    }
+    .przyciski-dol {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .przyciski-dol button {
+      flex: 1 1 calc(50% - 10px);
+    }
+    @media (max-width: 480px) {
+      main {
+        margin: 10px;
+        padding: 15px;
+      }
+      .przyciski-order {
+        flex-direction: column;
+      }
+      .przyciski-dol button {
+        flex: 1 1 100%;
+      }
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      max-width: 320px;
+      width: 90%;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: fadeInScale 0.2s ease-out;
+    }
+    .modal h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #111827;
+    }
+    .modal p {
+      margin: 0 0 20px 0;
+      color: #4b5563;
+      font-size: 14px;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .modal-buttons button {
+      flex: 1;
+    }
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
   </style>
 </head>
 <body>
+  <main>
+    <h1>Kalkulator Jumbo</h1>
+    <p>Oblicz swoją produktywność na podstawie liczby zrobionych orderów i czasu pracy.</p>
 
-<main>
-  <h1>Kalkulator Jumbo</h1>
+    <div class="sekcja">
+      <label for="nowyOrder">Dodaj order:</label>
+      <input type="tel" id="nowyOrder" placeholder="np. 124">
+      <div class="przyciski-order">
+        <button class="btn-primary" onclick="dodajOrder(1)">➕ Sekcja 1</button>
+        <button class="btn-primary" onclick="dodajOrder(2)">➕ Sekcja 2</button>
+        <button class="btn-danger" onclick="usunOstatniOrder()">🗑 Usuń ostatni</button>
+      </div>
+      <div id="listaOrderow"></div>
+    </div>
 
-  <div class="sekcja">
-    <label for="nowyOrder">Dodaj order:</label>
-    <input type="tel" id="nowyOrder" placeholder="np. 124">
-    <button onclick="dodajOrder(1)">Dodaj order (sekcja 1)</button>
-    <button onclick="dodajOrder(2)">Dodaj order (sekcja 2)</button>
-    <button onclick="usunOstatniOrder()" style="background:#dc3545;">Usuń order</button>
-    <div id="listaOrderow"></div>
+    <div class="sekcja">
+      <label for="czas">Czas pracy (w godzinach):</label>
+      <input id="czas" type="text" placeholder="np. 2,5">
+    </div>
+
+    <div class="sekcja">
+      <button class="btn-success" onclick="oblicz()">📊 Oblicz produktywność</button>
+      <div class="przyciski-dol">
+        <button class="btn-warning" onclick="wyczyscDane()">♻ Wyczyść dane</button>
+        <button class="btn-danger" onclick="usunHistorie()">🧨 Usuń historię</button>
+        <button class="btn-secondary" onclick="kopiujHistorie()">📋 Kopiuj historię</button>
+      </div>
+    </div>
+
+    <div id="wynik"></div>
+    <div id="historia"></div>
+  </main>
+
+  <div id="powiadomienie" class="toast"></div>
+
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+      <h2>Uwaga</h2>
+      <p id="modalTresc"></p>
+      <div class="modal-buttons">
+        <button class="btn-danger" onclick="modalPotwierdz()">Tak</button>
+        <button class="btn-secondary" onclick="modalAnuluj()">Nie</button>
+      </div>
+    </div>
   </div>
 
-  <div class="sekcja">
-    <label for="czas">Czas pracy (w godzinach):</label>
-    <input id="czas" type="text" placeholder="np. 2,5">
-  </div>
+  <script>
+    let orderyWszystkie = [];
+    let historiaList = [];
 
-  <button onclick="oblicz()">Oblicz produktywność</button>
-  <button onclick="wyczyscDane()" style="background:#ffc107;">Wyczyść dane</button>
-  <button onclick="usunHistorie()" style="background:#dc3545;">Usuń historię</button>
-  <button onclick="kopiujHistorie()" style="background:#28a745;">Kopiuj historię</button>
+    function pokazPowiadomienie(tresc) {
+      const x = document.getElementById("powiadomienie");
+      x.innerText = tresc;
+      x.className = "toast show";
+      setTimeout(() => x.className = x.className.replace("show", ""), 3000);
+    }
 
-  <div id="wynik"></div>
-  <div id="historia"></div>
-</main>
+    function dodajOrder(sekcja) {
+      let wartosc = document.getElementById("nowyOrder").value.trim();
+      if (!wartosc) {
+        pokazPowiadomienie("Wpisz numer orderu.");
+        return;
+      }
 
-<div id="powiadomienie" class="toast"></div>
+      wartosc = parseFloat(wartosc.replace(",", "."));
+      if (isNaN(wartosc) || wartosc <= 0) {
+        pokazPowiadomienie("Wpisz poprawny numer orderu większy niż 0.");
+        return;
+      }
 
-<script>
-let orderyWszystkie = [];
-let historiaList = [];
+      orderyWszystkie.push({ wartosc, sekcja });
+      document.getElementById("nowyOrder").value = "";
+      pokazListeOrderow();
+      zapiszSesje();
+    }
 
-function pokazPowiadomienie(tresc) {
-  const x = document.getElementById("powiadomienie");
-  x.innerText = tresc;
-  x.className = "toast show";
-  setTimeout(() => x.className = x.className.replace("show", ""), 3000);
-}
+    function usunOstatniOrder() {
+      if (orderyWszystkie.length === 0) {
+        pokazPowiadomienie("Brak orderów do usunięcia.");
+        return;
+      }
+      orderyWszystkie.pop();
+      pokazListeOrderow();
+      zapiszSesje();
+    }
 
-function dodajOrder(sekcja) {
-  let wartosc = document.getElementById("nowyOrder").value.trim();
-  if (!wartosc) return pokazPowiadomienie("Wpisz numer orderu.");
+    function pokazListeOrderow() {
+      const div = document.getElementById("listaOrderow");
+      if (orderyWszystkie.length === 0) {
+        div.style.display = "none";
+        div.innerHTML = "";
+        return;
+      }
 
-  wartosc = parseFloat(wartosc.replace(",", "."));
-  if (isNaN(wartosc) || wartosc <= 0) return pokazPowiadomienie("Wpisz poprawny numer orderu większy niż 0.");
+      const posortowane = [...orderyWszystkie].sort((a, b) => a.sekcja - b.sekcja);
 
-  orderyWszystkie.push({ wartosc, sekcja });
-  document.getElementById("nowyOrder").value = "";
-  pokazListeOrderow();
-}
+      const suma = posortowane.reduce((a, b) => a + b.wartosc, 0);
+      const sekcja1 = posortowane.filter(o => o.sekcja === 1).map(o => o.wartosc).join(", ");
+      const sekcja2Lista = posortowane.filter(o => o.sekcja === 2);
+      const sekcja2 = sekcja2Lista.map(o => o.wartosc).join(", ");
 
-function usunOstatniOrder() {
-  if (orderyWszystkie.length === 0) return pokazPowiadomienie("Brak orderów do usunięcia.");
-  orderyWszystkie.pop();
-  pokazListeOrderow();
-}
+      div.style.display = "block";
+      let html = `<strong>📦 Ordery:</strong><br>`;
+      if (sekcja1) {
+        html += `<strong>Sekcja 1:</strong> ${sekcja1}<br>`;
+      }
+      if (sekcja2Lista.length > 0) {
+        html += `<strong>Sekcja 2:</strong> ${sekcja2}<br>`;
+      }
+      html += `<strong>🔢 Suma:</strong> ${suma}`;
+      div.innerHTML = html;
+    }
+    
+    function oblicz() {
+      const czas = parseFloat(document.getElementById("czas").value.replace(",", "."));
+      if (isNaN(czas) || czas <= 0) {
+        pokazPowiadomienie("Wpisz poprawny czas pracy.");
+        return;
+      }
+      if (orderyWszystkie.length === 0) {
+        pokazPowiadomienie("Dodaj przynajmniej jeden order.");
+        return;
+      }
 
-function pokazListeOrderow() {
-  const div = document.getElementById("listaOrderow");
-  if (orderyWszystkie.length === 0) {
-    div.style.display = "none";
-    div.innerHTML = "";
-    return;
-  }
+      const suma1 = orderyWszystkie.filter(o => o.sekcja === 1).reduce((a,b)=>a+b.wartosc,0);
+      const suma2 = orderyWszystkie.filter(o => o.sekcja === 2).reduce((a,b)=>a+b.wartosc,0);
+      const suma = suma1 + suma2;
+      const normaLaczna = ((suma1 * 189) + (suma2 * 197)) / suma;
+      const produktywnosc = suma / czas;
+      const procent = (produktywnosc / normaLaczna) * 100;
 
-  const posortowane = [...orderyWszystkie].sort((a, b) => a.sekcja - b.sekcja);
-  const suma = posortowane.reduce((a, b) => a + b.wartosc, 0);
-  const sekcja1Lista = posortowane.filter(o => o.sekcja === 1).map(o => o.wartosc);
-  const sekcja2Lista = posortowane.filter(o => o.sekcja === 2).map(o => o.wartosc);
+      const wynikDiv = document.getElementById("wynik");
+      wynikDiv.innerHTML =
+        `<strong>Wynik:</strong>` +
+        `<div>Suma orderów: <strong>${suma}</strong></div>` +
+        `<div>Czas pracy: <strong>${czas} h</strong></div>` +
+        `<div>Produktywność: <strong>${produktywnosc.toFixed(2)} ord/h</strong></div>` +
+        `<div>Realizacja normy: <strong>${procent.toFixed(2)}%</strong></div>` +
+        `<div>Norma łączna (ważona): <strong>${normaLaczna.toFixed(2)} ord/h</strong></div>`;
 
-  div.style.display = "block";
-  let html = `<strong>📦 Ordery:</strong><br>`;
+      if (procent >= 100) {
+        wynikDiv.style.backgroundColor = "#dcfce7";
+        wynikDiv.style.borderColor = "#16a34a";
+      } else if (procent >= 90) {
+        wynikDiv.style.backgroundColor = "#fef9c3";
+        wynikDiv.style.borderColor = "#eab308";
+      } else {
+        wynikDiv.style.backgroundColor = "#fee2e2";
+        wynikDiv.style.borderColor = "#ef4444";
+      }
 
-  if (sekcja1Lista.length > 0)
-    html += `<strong>Sekcja 1:</strong> ${sekcja1Lista.join(", ")}<br>`;
+      dodajDoHistorii(suma1, suma2, czas, suma, produktywnosc, procent, normaLaczna);
+      zapiszSesje();
+    }
 
-  if (sekcja2Lista.length > 0)
-    html += `<strong>Sekcja 2:</strong> ${sekcja2Lista.join(", ")}<br>`;
+    function dodajDoHistorii(s1, s2, czas, suma, prod, proc, norma) {
+      const data = new Date();
+      const dataStr = data.toLocaleDateString("pl-PL");
+      const godzStr = data.toLocaleTimeString("pl-PL");
 
-  html += `<strong>🔢 Suma:</strong> ${suma}`;
-  div.innerHTML = html;
-}
+      const lista1 = orderyWszystkie.filter(o=>o.sekcja===1).map(o=>o.wartosc).join(", ") || "brak";
+      const lista2 = orderyWszystkie.filter(o=>o.sekcja===2).map(o=>o.wartosc).join(", ") || "brak";
 
-function oblicz() {
-  const czas = parseFloat(document.getElementById("czas").value.replace(",", "."));
-  if (isNaN(czas) || czas <= 0) return pokazPowiadomienie("Wpisz poprawny czas pracy.");
-  if (orderyWszystkie.length === 0) return pokazPowiadomienie("Dodaj przynajmniej jeden order.");
-
-  const suma1 = orderyWszystkie.filter(o => o.sekcja === 1).reduce((a,b)=>a+b.wartosc,0);
-  const suma2 = orderyWszystkie.filter(o => o.sekcja === 2).reduce((a,b)=>a+b.wartosc,0);
-  const suma = suma1 + suma2;
-
-  const normaLaczna = ((suma1 * 189) + (suma2 * 197)) / suma;
-  const produktywnosc = suma / czas;
-  const procent = (produktywnosc / normaLaczna) * 100;
-
-  const wynikDiv = document.getElementById("wynik");
-  wynikDiv.innerHTML =
-    `Suma orderów: ${suma}<br>` +
-    `Czas pracy: ${czas}h<br>` +
-    `Produktywność: ${produktywnosc.toFixed(2)} ord/h<br>` +
-    `Realizacja normy: ${procent.toFixed(2)}%`;
-
-  wynikDiv.style.background =
-    procent >= 100 ? "#c8e6c9" : procent >= 90 ? "#fff3cd" : "#f8d7da";
-
-  dodajDoHistorii(suma1, suma2, czas, suma, produktywnosc, procent);
-}
-
-function dodajDoHistorii(s1, s2, czas, suma, prod, proc) {
-  const wpis = `📅 ${new Date().toLocaleString("pl-PL")}
+      const wpis = `📅 ${dataStr} ${godzStr}
 Suma: ${suma}, czas: ${czas}h
 Produktywność: ${prod.toFixed(2)} ord/h (${proc.toFixed(2)}%)
-Sekcja 1: ${orderyWszystkie.filter(o=>o.sekcja===1).map(o=>o.wartosc).join(", ")}
-Sekcja 2: ${orderyWszystkie.filter(o=>o.sekcja===2).map(o=>o.wartosc).join(", ")}`;
+Norma łączna: ${norma.toFixed(2)} ord/h
+Sekcja 1: ${lista1}
+Sekcja 2: ${lista2}`;
 
-  historiaList.push(wpis);
-  localStorage.setItem("jumboHistoria", JSON.stringify(historiaList));
-  pokazHistorie();
-}
+      historiaList.push(wpis);
+      localStorage.setItem("jumboHistoria", JSON.stringify(historiaList));
+      pokazHistorie();
+    }
 
-function pokazHistorie() {
-  const div = document.getElementById("historia");
-  if (historiaList.length === 0) { div.innerHTML = ""; return; }
-  div.innerHTML = `<h3>Historia obliczeń:</h3><ul>` + historiaList.map(h=>`<li>${h.replace(/\n/g,"<br>")}</li>`).join("") + "</ul>";
-}
+    function pokazHistorie() {
+      const div = document.getElementById("historia");
+      if (historiaList.length === 0) {
+        div.innerHTML = "";
+        return;
+      }
+      const items = historiaList.map(h => `<li>${h.replace(/\\n/g, "<br>")}</li>`).join("");
+      div.innerHTML = `<h2>Historia obliczeń:</h2><ul>${items}</ul>`;
+    }
 
-function wyczyscDane() {
-  orderyWszystkie = [];
-  dokument.getElementById
-  pokazListeOrderow();
-  pokazPowiadomienie("Wyczyszczono dane.");
-}
+    function wyczyscDane() {
+      pokazModalPotwierdzenie("Czy na pewno chcesz wyczyścić bieżące dane (ordery i czas)?", (potwierdzone) => {
+        if (!potwierdzone) return;
+        orderyWszystkie = [];
+        document.getElementById("nowyOrder").value = "";
+        document.getElementById("czas").value = "";
+        document.getElementById("wynik").innerHTML = "";
+        pokazListeOrderow();
+        zapiszSesje();
+        pokazPowiadomienie("Wyczyszczono bieżące dane.");
+      });
+    }
 
-function kopiujHistorie() {
-  if (historiaList.length === 0) return pokazPowiadomienie("Brak historii do kopiowania.");
-  navigator.clipboard.writeText(historiaList.join("\n\n"));
-  pokazPowiadomienie("Skopiowano historię!");
-}
+    function kopiujHistorie() {
+      if (historiaList.length === 0) {
+        pokazPowiadomienie("Brak historii do kopiowania.");
+        return;
+      }
+      const tekst = historiaList.join("\\n\\n");
+      navigator.clipboard.writeText(tekst).then(() => {
+        pokazPowiadomienie("Skopiowano historię!");
+      }).catch(() => {
+        pokazPowiadomienie("Nie udało się skopiować historii.");
+      });
+    }
 
-function usunHistorie() {
-  historiaList = [];
-  localStorage.removeItem("jumboHistoria");
-  pokazHistorie();
-  pokazPowiadomienie("Historia usunięta.");
-}
+    function usunHistorie() {
+      if (historiaList.length === 0) {
+        pokazPowiadomienie("Brak historii do usunięcia.");
+        return;
+      }
+      pokazModalPotwierdzenie("Czy na pewno chcesz usunąć CAŁĄ historię obliczeń?", (potwierdzone) => {
+        if (!potwierdzone) return;
+        historiaList = [];
+        localStorage.removeItem("jumboHistoria");
+        pokazHistorie();
+        pokazPowiadomienie("Historia została usunięta.");
+      });
+    }
 
-// Wczytywanie historii
-const h = localStorage.getItem("jumboHistoria");
-if (h) historiaList = JSON.parse(h);
-pokazHistorie();
-</script>
+    function zapiszSesje() {
+      const sesja = {
+        orderyWszystkie,
+        czas: document.getElementById("czas").value
+      };
+      localStorage.setItem("jumboSesja", JSON.stringify(sesja));
+    }
+
+    function wczytajSesje() {
+      const sesjaStr = localStorage.getItem("jumboSesja");
+      if (!sesjaStr) return;
+      try {
+        const sesja = JSON.parse(sesjaStr);
+        if (Array.isArray(sesja.orderyWszystkie)) {
+          orderyWszystkie = sesja.orderyWszystkie;
+        }
+        if (typeof sesja.czas === "string") {
+          document.getElementById("czas").value = sesja.czas;
+        }
+        pokazListeOrderow();
+      } catch (e) {
+        console.error("Błąd przy wczytywaniu sesji:", e);
+      }
+    }
+
+    (function init() {
+      const historiaStr = localStorage.getItem("jumboHistoria");
+      if (historiaStr) {
+        try {
+          const h = JSON.parse(historiaStr);
+          if (Array.isArray(h)) {
+            historiaList = h;
+          }
+        } catch (e) {
+          console.error("Błąd przy wczytywaniu historii:", e);
+        }
+      }
+      pokazHistorie();
+      wczytajSesje();
+    })();
+
+    setInterval(zapiszSesje, 3000);
+    window.addEventListener("beforeunload", zapiszSesje);
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js").catch(err => {
+          console.error("Service worker registration failed:", err);
+        });
+      });
+    }
+
+    let modalCallback = null;
+    function pokazModalPotwierdzenie(tresc, callback) {
+      modalCallback = callback;
+      document.getElementById("modalTresc").innerText = tresc;
+      document.getElementById("modalOverlay").style.display = "flex";
+    }
+    function modalPotwierdz() {
+      document.getElementById("modalOverlay").style.display = "none";
+      if (modalCallback) modalCallback(true);
+    }
+    function modalAnuluj() {
+      document.getElementById("modalOverlay").style.display = "none";
+      if (modalCallback) modalCallback(false);
+    }
+  </script>
 
 </body>
 </html>
